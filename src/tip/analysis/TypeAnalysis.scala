@@ -101,7 +101,10 @@ class TypeAnalysis(program: AProgram)(implicit declData: DeclarationData) extend
   def visit(node: AstNode, arg: Unit): Unit = {
     log.verb(s"Visiting ${node.getClass.getSimpleName} at ${node.loc}")
     node match {
-      case program: AProgram => // <--- Complete here
+      case program: AProgram =>
+        if (program.hasMainFunction) {
+          unify(program.mainFunction, FunctionType(program.mainFunction.params.map(_ => IntType()), IntType()))
+        }
       case _: ANumber => unify(node, IntType())
       case _: AInput => unify(node, IntType())
       case is: AIfStmt => unify(is.guard, IntType())
