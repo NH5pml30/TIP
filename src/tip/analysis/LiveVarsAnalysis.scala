@@ -12,6 +12,7 @@ import scala.collection.immutable.Set
   * Base class for live variables analysis.
   */
 abstract class LiveVarsAnalysis(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData) extends FlowSensitiveAnalysis(false) {
+  import tip.ast.AstOps._
 
   val lattice: MapLattice[CfgNode, PowersetLattice[ADeclaration]] = new MapLattice(new PowersetLattice())
 
@@ -25,15 +26,15 @@ abstract class LiveVarsAnalysis(cfg: IntraproceduralProgramCfg)(implicit declDat
       case _: CfgFunExitNode => lattice.sublattice.bottom
       case r: CfgStmtNode =>
         r.data match {
-          case cond: AExpr => ??? //<--- Complete here
+          case cond: AExpr => s ++ cond.appearingIds
           case as: AAssignStmt =>
             as.left match {
-              case id: AIdentifier => ??? //<--- Complete here
+              case id: AIdentifier => s - id ++ as.right.appearingIds;
               case _ => ???
             }
-          case varr: AVarStmt => ??? //<--- Complete here
-          case ret: AReturnStmt => ??? //<--- Complete here
-          case out: AOutputStmt => ??? //<--- Complete here
+          case varr: AVarStmt => s -- varr.declIds
+          case ret: AReturnStmt => s ++ ret.exp.appearingIds
+          case out: AOutputStmt => s ++ out.exp.appearingIds
           case _ => s
         }
       case _ => s
