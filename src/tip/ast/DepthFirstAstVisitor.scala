@@ -66,6 +66,8 @@ trait DepthFirstAstVisitor[A] {
         visit(alloc.exp, arg)
       case ref: AVarRef =>
         visit(ref.id, arg)
+      case cast: ACast =>
+        visit(cast.exp, arg)
       case _: AAtomicExpr | _: AIdentifierDeclaration =>
     }
 }

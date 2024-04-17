@@ -48,6 +48,8 @@ class TipParser(val input: ParserInput) extends Parser with Comments {
     val KERROR = "error"
   }
 
+  val types = Types.values.map(_.toString())
+
   val keywords = Set(
     LanguageKeywords.KALLOC,
     LanguageKeywords.KINPUT,
@@ -59,7 +61,7 @@ class TipParser(val input: ParserInput) extends Parser with Comments {
     LanguageKeywords.KNULL,
     LanguageKeywords.KOUTPUT,
     LanguageKeywords.KERROR
-  )
+  ) ++ types
 
   def InputLine = rule {
     Program ~ EOI
@@ -145,11 +147,17 @@ class TipParser(val input: ParserInput) extends Parser with Comments {
   def Atom: Rule1[AExpr] = rule {
     (FunApp
       | Number
+      | Cast
       | Parens
       | PointersExpression
       | push(cursor) ~ wspStr(LanguageKeywords.KINPUT) ~> ((cur: Int) => AInput(cur))
       | Identifier
       | Record)
+  }
+
+  def Cast = rule {
+    push(cursor) ~ "(" ~ valueMap(types.map(x => (x, Types.withName(x))).toMap) ~ ")" ~ Atom ~>
+      ((cur: Int, t: Types.Value, e: AExpr) => ACast(t, e, cur))
   }
 
   def Parens = rule {

@@ -61,6 +61,15 @@ sealed abstract class AstNode extends Product {
 
 //////////////// Expressions //////////////////////////
 
+object Types extends Enumeration {
+  val BoolT = Value("bool")
+  val ByteT = Value("byte")
+  val CharT = Value("char")
+  val IntT = Value("int")
+  val BigIntT = Value("bigint")
+  val AnyT = Value("any")
+}
+
 sealed trait AExprOrIdentifierDeclaration extends AstNode
 
 sealed trait AExpr extends AExprOrIdentifierDeclaration
@@ -94,6 +103,8 @@ case class ARecord(fields: List[ARecordField], loc: Loc) extends AExpr
 case class ARecordField(field: String, exp: AExpr, loc: Loc)
 
 case class AFieldAccess(record: AExpr, field: String, loc: Loc) extends AExpr with AAtomicExpr
+
+case class ACast(toType: Types.Value, exp: AExpr, loc: Loc) extends AExpr with AAtomicExpr
 
 //////////////// Statements //////////////////////////
 

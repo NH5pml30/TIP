@@ -80,6 +80,8 @@ object AstPrinters {
               s"return ${exp.print(printer)};"
             case AVarStmt(declIds, _) =>
               s"var ${declIds.map(_.print(printer)).mkString(",")};"
+            case ACast(toType, exp, _) =>
+              s"(${toType}) ${exp.print(printer)}"
             case AProgram(funs, _) =>
               s"${funs.map(_.print(printer)).mkString("\n\n")}"
           }

@@ -35,7 +35,9 @@ trait IntervalAnalysisWidening extends ValueAnalysisMisc with Dependencies[CfgNo
     (x, y) match {
       case (IntervalLattice.EmptyInterval, _) => y
       case (_, IntervalLattice.EmptyInterval) => x
-      case ((l1, h1), (l2, h2)) => ??? //<--- Complete here
+      case (i1, i2) =>
+        val (l, h) = lub(i1, i2)
+        (maxB(l), minB(h))
     }
 
   def widen(x: liftedstatelattice.Element, y: liftedstatelattice.Element): liftedstatelattice.Element =
