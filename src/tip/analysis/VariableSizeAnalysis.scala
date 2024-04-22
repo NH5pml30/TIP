@@ -19,8 +19,11 @@ object VariableSizeAnalysis {
       isUnsigned && checkLength >= bitLength;
     }
 
-    private def fitsIn(t: BitType): Boolean = {
-      if (t.isUnsigned) fitsInUnsigned(t.bitLength) else fitsInSigned(t.bitLength)
+    private def fitsIn(t: IntType): Boolean = {
+      t match {
+        case Some(t) => if (t.isUnsigned) fitsInUnsigned(t.bitLength) else fitsInSigned(t.bitLength)
+        case _ => true // bigint
+      }
     }
 
     def widen(): Option[Int] = {
@@ -48,7 +51,7 @@ object VariableSizeAnalysis {
 
     def toType(): Option[Types.Value] = {
       Types.values.toStream
-        .flatMap(tt => IntType.fromType(tt).flatMap(bt => if (fitsIn(bt)) Some(tt) else None))
+        .flatMap(tt => if (fitsIn(IntType.fromType(tt))) Some(tt) else None)
         .headOption
     }
   }
